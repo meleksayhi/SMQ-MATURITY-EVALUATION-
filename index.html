@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ISO 9001 BE - Audit Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        
+        /* Navigation par onglets */
+        .tabs { display: flex; overflow-x: auto; background: var(--primary); sticky; top: 0; z-index: 100; }
+        .tab-btn { padding: 15px; border: none; background: none; color: white; white-space: nowrap; cursor: pointer; opacity: 0.7; }
+        .tab-btn.active { opacity: 1; border-bottom: 3px solid var(--accent); font-weight: bold; }
+
+        .container { padding: 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
+        h2 { font-size: 1rem; margin-top: 0; color: var(--primary); }
+        label { font-size: 0.85rem; display: block; margin-bottom: 8px; color: #666; }
+        
+        select, textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.9rem; box-sizing: border-box; }
+        textarea { height: 60px; margin-top: 8px; font-style: italic; background: #fafafa; }
+
+        .dashboard { text-align: center; background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        .score-big { font-size: 3rem; font-weight: bold; color: var(--success); }
+        
+        .save-btn { background: var(--success); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'dash')">Tableau de bord</button>
+        <button class="tab-btn" onclick="openTab(event, 'c456')">Stratégie (4-6)</button>
+        <button class="tab-btn" onclick="openTab(event, 'c7')">Support (7)</button>
+        <button class="tab-btn" onclick="openTab(event, 'c8')">Réalisation (8)</button>
+        <button class="tab-btn" onclick="openTab(event, 'c910')">Progrès (9-10)</button>
+    </div>
+
+    <div class="container">
+        
+        <div id="dash" class="section active">
+            <div class="dashboard">
+                <p>Maturité Globale du Bureau d'Études</p>
+                <div class="score-big" id="globalScore">0.0</div>
+                <p id="mention">Analyse requise</p>
+                <canvas id="radarChart"></canvas>
+                <button class="save-btn" onclick="sauvegarder()">Sauvegarder l'Audit</button>
+            </div>
+        </div>
+
+        <div id="c456" class="section">
+            <div class="card">
+                <h2>4.1 & 4.2 Contexte & Parties Intéressées</h2>
+                <label>Enjeux BE (Technologiques, Réglementaires) :</label>
+                <select class="score" data-idx="0" onchange="calculer()">
+                    <option value="1">1 - Analyse absente</option>
+                    <option value="3">3 - SWOT/Matrice PI à jour</option>
+                    <option value="5">5 - Intégré à la stratégie annuelle</option>
+                </select>
+                <textarea placeholder="Preuves : PV de revue de direction..."></textarea>
+            </div>
+            <div class="card">
+                <h2>6.1 Risques & Opportunités</h2>
+                <label>Anticipation des dérives projets :</label>
+                <select class="score" data-idx="1" onchange="calculer()">
+                    <option value="1">1 - Réactif (on gère les crises)</option>
+                    <option value="3">3 - Registre des risques par projet</option>
+                    <option value="5">5 - Analyse de risque prédictive</option>
+                </select>
+                <textarea placeholder="Preuves : Plan de management de risque..."></textarea>
+            </div>
+        </div>
+
+        <div id="c7" class="section">
+            <div class="card">
+                <h2>7.1.5 Métrologie & Outils (Lien GMAO)</h2>
+                <label>Logiciels de calcul et appareils de mesure :</label>
+                <select class="score" data-idx="2" onchange="calculer()">
+                    <option value="1">1 - Suivi incertain</option>
+                    <option value="3">3 - Licences et étalonnages à jour</option>
+                    <option value="5">5 - GMAO intégrée et alertes auto</option>
+                </select>
+                <textarea placeholder="Preuves : Certificats d'étalonnage..."></textarea>
+            </div>
+            <div class="card">
+                <h2>7.1.6 Connaissances Organisationnelles</h2>
+                <label>Partage du savoir-faire métier :</label>
+                <select class="score" data-idx="3" onchange="calculer()">
+                    <option value="1">1 - Dépend des personnes</option>
+                    <option value="3">3 - Bibliothèque technique partagée</option>
+                    <option value="5">5 - Système de REX (Leçons apprises) actif</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="c8" class="section">
+            <div class="card" style="border-left-color: #e67e22;">
+                <h2>8.3.3 Données d'entrée Conception</h2>
+                <label>Cahier des charges et Normes :</label>
+                <select class="score" data-idx="4" onchange="calculer()">
+                    <option value="1">1 - Souvent incomplets</option>
+                    <option value="3">3 - Revue de contrat formalisée</option>
+                    <option value="5">5 - Check-list exhaustive par type d'étude</option>
+                </select>
+            </div>
+            <div class="card" style="border-left-color: #e67e22;">
+                <h2>8.3.4 Maîtrise (Vérification)</h2>
+                <label>Contrôle des plans et calculs :</label>
+                <select class="score" data-idx="5" onchange="calculer()">
+                    <option value="1">1 - Auto-contrôle uniquement</option>
+                    <option value="3">3 - Visa d'un second ingénieur (Pair)</option>
+                    <option value="5">5 - Revue interdisciplinaire formalisée</option>
+                </select>
+            </div>
+            <div class="card" style="border-left-color: #e67e22;">
+                <h2>8.5.2 Identification & Traçabilité</h2>
+                <label>Gestion des indices (Versions) :</label>
+                <select class="score" data-idx="6" onchange="calculer()">
+                    <option value="1">1 - Risque de travailler sur vieux plans</option>
+                    <option value="3">3 - Système d'indices maîtrisé</option>
+                    <option value="5">5 - PDM/EDM automatisé sans erreur possible</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="c910" class="section">
+            <div class="card">
+                <h2>9.1.2 Satisfaction Client</h2>
+                <label>Retours sur livrables :</label>
+                <select class="score" data-idx="7" onchange="calculer()">
+                    <option value="1">1 - Réclamation uniquement</option>
+                    <option value="3">3 - Enquêtes de satisfaction régulières</option>
+                    <option value="5">5 - Co-conception avec le client</option>
+                </select>
+            </div>
+            <div class="card">
+                <h2>10.2 Non-conformités & Actions</h2>
+                <label>Traitement des erreurs de conception :</label>
+                <select class="score" data-idx="8" onchange="calculer()">
+                    <option value="1">1 - Correction ponctuelle</option>
+                    <option value="3">3 - Analyse des causes racines</option>
+                    <option value="5">5 - Zéro récurrence grâce au SMQ</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let chart;
+        const labels = ['Stratégie', 'Support', 'Conception', 'Vérification', 'Traçabilité', 'Client', 'Amélioration'];
+
+        function openTab(evt, sectionName) {
+            let sections = document.getElementsByClassName("section");
+            for (let s of sections) s.classList.remove("active");
+            let btns = document.getElementsByClassName("tab-btn");
+            for (let b of btns) b.classList.remove("active");
+            document.getElementById(sectionName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function calculer() {
+            const scores = Array.from(document.querySelectorAll('.score')).map(s => parseInt(s.value));
+            const moyenne = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            document.getElementById('globalScore').innerText = moyenne;
+            
+            let mention = "Maturité Initiale";
+            if(moyenne >= 3) mention = "Système Défini";
+            if(moyenne >= 4.5) mention = "Excellence Métier";
+            document.getElementById('mention').innerText = mention;
+
+            updateChart(scores);
+        }
+
+        function updateChart(dataValues) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Context', 'Risques', 'Support', 'Connaissances', 'Entrées', 'Contrôles', 'Versions', 'Client', 'Progrès'],
+                    datasets: [{
+                        label: 'Niveau',
+                        data: dataValues,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        borderWidth: 2
+                    }]
+                },
+                options: { scales: { r: { min: 0, max: 5 } } }
+            });
+        }
+
+        function sauvegarder() {
+            const scores = Array.from(document.querySelectorAll('.score')).map(s => s.value);
+            localStorage.setItem('iso_audit_data', JSON.stringify(scores));
+            alert("Audit enregistré sur votre téléphone !");
+        }
+
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem('iso_audit_data'));
+            if(saved) {
+                document.querySelectorAll('.score').forEach((s, i) => s.value = saved[i]);
+            }
+            calculer();
+        };
+    </script>
+</body>
+</html>
