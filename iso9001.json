@@ -1,1 +1,18 @@
-
+[
+  {
+    "clause": "4",
+    "name": "Contexte de l'organisation",
+    "questions": [
+      "L'organisation a-t-elle identifié les parties intéressées ?",
+      "Le contexte interne et externe est-il défini ?"
+    ]
+  },
+  {
+    "clause": "5",
+    "name": "Leadership",
+    "questions": [
+      "La direction est-elle engagée dans le système qualité ?",
+      "La politique qualité est-elle communiquée et comprise ?"
+    ]
+  }
+]
